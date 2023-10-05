@@ -22,9 +22,9 @@ class Block implements State {
 }
 
 type Action =
-  | { type: "add"; payload: State["level"] }
+  | { type: "add"; payload: Pick<State, 'level' | 'id' | 'name'> }
   | { type: "remove"; payload: State["id"] }
-  | { type: "edit"; payload: { id: State["id"]; name: State["name"] } }
+  | { type: "edit"; payload: Pick<State, 'level' | 'id' | 'name'> }
   | { type: "reset" };
 
 const reducer: Reducer<State, Action> = (state, action) => {
@@ -37,14 +37,16 @@ const reducer: Reducer<State, Action> = (state, action) => {
       const newSubLevel = state.subLevel.filter((child) => child.id !== action.payload);
       return { ...state, subLevel: newSubLevel };
     }
-    case "edit": {
+    case "edit": { 
       const newSubLevel = state.subLevel.map((child) => {
-        if (child.id === action.payload.id) {
-          return { ...child, name: action.payload.name };
+        if(child.id === action.payload.id) {
+          return { ...child, name: action.payload.name }
+        } else {
+          return child;
         }
-        return child;
       });
       return { ...state, subLevel: newSubLevel };
+      
     }
     case "reset": {
       return { ...initialState };
@@ -53,6 +55,19 @@ const reducer: Reducer<State, Action> = (state, action) => {
       return state;
   }
 };
+ç
+function findObjectById(id: string, obj: State): State | undefined {
+  if (obj.id === id) {
+    return obj;
+  }
+  for (const subObj of obj.subLevel) {
+    const result = findObjectById(id, subObj);
+    if (result) {
+      return result;
+    }
+  }
+  return undefined;
+}
 
 const initialState: State = {
   id: "0",
@@ -73,6 +88,9 @@ function MainBlock() {
   function handleRemove(id: State["id"]) {
     dispatch({ type: "remove", payload: id });
   }
+  function handleAddSubBlock(level: State["level"], id: State["id"]) {
+    dispatch({ type: "add-sublevel", payload: { level, id } });
+  }
 
   const className = `${classes.container} ${classes.main}`;
 
@@ -86,11 +104,11 @@ function MainBlock() {
         {state.subLevel.map(({ id, level, name, subLevel }) => (
           <SubBlock
             key={id}
-            level={level}
             name={name}
             subLevel={subLevel}
             onEditName={handleEditName.bind(null, id)}
             onRemove={handleRemove.bind(null, id)}
+            onAddSubBlock={handleAddSubBlock.bind(null, level + 1, id)}
           />
         ))}
       </div>
