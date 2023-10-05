@@ -1,0 +1,49 @@
+.button,
+.button:visited {
+  display: inline-flex;
+  flex-flow: wrap;
+  -moz-box-pack: center;
+  place-content: center;
+  -moz-box-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  font-weight: 600;
+  font-size: 0.75rem;
+  min-width: 20px;
+  line-height: 1;
+  height: 20px;
+  border-radius: 15px;
+  transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  background-color: var(--slate-300);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.button:hover {
+  background-color: var(--slate-400);
+}
+.button:active {
+  box-shadow: var(--shadow-inset);
+}
+
+button.check,
+button.check:visited {
+  background-color: var(--green-500);
+}
+button.check:hover {
+  background-color: var(--green-700);
+}
+
+button.close,
+button.close:visited {
+  background-color: var(--red-500);
+}
+button.close:hover {
+  background-color: var(--red-700);
+}
+
+.logo {
+  height: 0.75rem;
+  filter: invert(99%) sepia(1%) saturate(0%) hue-rotate(3deg) brightness(106%) contrast(101%);
+}

@@ -1,0 +1,22 @@
+.container {
+  display: inline-block;
+  background-color: white;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--slate-300);
+  color: var(--slate-800);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.input {
+  color: var(--slate-400);
+  border: none;
+}
+.input:focus {
+  outline: none;
+}
+
+div.main {
+  border: 2px dashed var(--slate-300);
+  cursor: move;
+}

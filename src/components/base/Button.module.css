@@ -1,0 +1,37 @@
+.button,
+.button:visited {
+  font-weight: 600;
+  color: var(--slate-500);
+  text-decoration: inherit;
+  text-transform: uppercase;
+  border: none;
+  padding: 1rem;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.button:hover {
+  color: white;
+  background-color: var(--slate-300);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--indigo-500);
+}
+
+.button:active {
+  box-shadow: var(--shadow-inset);
+  outline: none;
+}
+
+.button-primary,
+.button-primary:visited {
+  border-radius: 2px;
+  background-color: var(--indigo-500);
+  color: white;
+}
+
+.button-primary:hover {
+  background-color: var(--indigo-700);
+}
