@@ -1,0 +1,6 @@
+.container {
+  position: relative;
+  flex-grow: 1;
+  border: 1px solid var(--slate-300);
+  background-color: var(--slate-100);
+}

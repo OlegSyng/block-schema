@@ -1,11 +1,11 @@
 import Header from "./components/Header";
-import Canvas from "./components/canvas/Canvas";
+import Container from "./components/container/Container";
 
 function App() {
   return (
     <>
       <Header />
-      <Canvas />
+      <Container />
     </>
   );
 }

@@ -176,3 +176,9 @@ button:-moz-focusring,
 .items-center {
   align-items: center;
 }
+.flex-wrap {
+  flex-wrap: wrap;
+}
+.grow-1 {
+  flex-grow: 1;
+}
