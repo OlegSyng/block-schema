@@ -1,17 +1,70 @@
-.block-container {
-  display: block;
+.container {
+  width: max-content;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .block-box {
+  box-sizing: border-box;
+  padding-right: 110px;
+}
+
+.block-name {
+  max-width: 200px;
+  min-width: 120px;
   position: relative;
-  max-width: 250px;
+  box-sizing: border-box;
   background-color: white;
   padding: 0.75rem 1.5rem;
-  border: 1px solid var(--slate-300);
   color: var(--slate-800);
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 auto;
+  border: 1px solid var(--slate-300);
+  font-size: 1rem;
+  cursor: move;
+  border-radius: 2px;
+}
+
+div.main {
+  border: 2px dashed var(--slate-300);
+}
+
+div.level1 {
+  border: none;
+  background-color: var(--orange-400);
+  color: white;
+}
+div.level2 {
+  border: none;
+  background-color: var(--cyan-400);
+  color: white;
+}
+div.level3 {
+  border: none;
+  background-color: var(--slate-400);
+  color: white;
+}
+
+div.main-sublevel::after {
+  content: "";
+  position: absolute;
+  bottom: calc(-15px - 2px);
+  left: 50%;
+  height: 15px;
+  width: 1px;
+  z-index: 11;
+  background-color: var(--slate-300);
+}
+
+div.sub-sublevel::after {
+  content: "";
+  position: absolute;
+  bottom: calc(-15px - 1px);
+  left: 50%;
+  height: 15px;
+  width: 1px;
+  z-index: 11;
+  background-color: var(--slate-300);
 }
 
 .block-actions {
@@ -23,7 +76,7 @@
   align-items: center;
 }
 
-.block-box--input {
+.block-name input {
   display: block;
   min-width: 0px;
   width: 100%;
@@ -32,23 +85,14 @@
   border: none;
   font-size: 1rem;
   text-align: center;
+  text-overflow: clip;
 }
-.block-box--input:focus {
+.block-name input:focus {
   outline: none;
 }
 
-.block-box--name {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--slate-200);
-  width: min-content;
-  max-width: 200px;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.children {
+  display: flex;
+  position: relative;
 }
 
-div.main {
-  border: 2px dashed var(--slate-300);
-  cursor: move;
-}
