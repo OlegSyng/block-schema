@@ -17,7 +17,6 @@
   position: relative;
   box-sizing: border-box;
   background-color: white;
-  padding: 0.75rem 1.5rem;
   color: var(--slate-800);
   border: 1px solid var(--slate-300);
   font-size: 1rem;
@@ -27,22 +26,6 @@
 
 div.main {
   border: 2px dashed var(--slate-300);
-}
-
-div.level1 {
-  border: none;
-  background-color: var(--orange-400);
-  color: white;
-}
-div.level2 {
-  border: none;
-  background-color: var(--cyan-400);
-  color: white;
-}
-div.level3 {
-  border: none;
-  background-color: var(--slate-400);
-  color: white;
 }
 
 div.main-sublevel::after {
@@ -79,20 +62,42 @@ div.sub-sublevel::after {
 .block-name input {
   display: block;
   min-width: 0px;
-  width: 100%;
+  width: calc(100% - 3rem);
   box-sizing: border-box;
   color: var(--slate-800);
   border: none;
   font-size: 1rem;
   text-align: center;
   text-overflow: clip;
+  margin: 0.75rem 1.5rem;
 }
 .block-name input:focus {
   outline: none;
+}
+
+.block-name span {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  user-select: none;
+}
+
+span.level1 {
+  border: none;
+  background-color: var(--orange-400);
+  color: white;
+}
+span.level2 {
+  border: none;
+  background-color: var(--cyan-400);
+  color: white;
+}
+span.level3 {
+  border: none;
+  background-color: var(--slate-400);
+  color: white;
 }
 
 .children {
   display: flex;
   position: relative;
 }
-

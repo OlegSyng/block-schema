@@ -1,0 +1,8 @@
+.logo {
+  height: 1rem;
+  filter: invert(47%) sepia(20%) saturate(476%) hue-rotate(176deg) brightness(91%) contrast(90%);
+}
+
+.select-container {
+  display: inline-block;
+}

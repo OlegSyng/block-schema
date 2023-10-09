@@ -1,8 +1,9 @@
 import { useReducer, useState } from "react";
-import WidgetButton from "../base/WidgetButton";
+import WidgetButton from "../buttons/WidgetButton";
 import Lines from "../lines/Lines";
 import classes from "./Block.module.css";
-import type { Reducer, ChangeEvent } from "react";
+import type { Reducer, ChangeEvent, MouseEvent } from "react";
+import type { Position } from "../container/Container";
 
 class BlockState {
   id: string;
@@ -21,6 +22,9 @@ interface BlockProps {
   initialValue: Pick<BlockState, "level" | "name">;
   isInitialEditing?: boolean;
   onRemove: () => void;
+  onMouseDown: (pos: Position) => void;
+  onMouseMove: (pos: Position) => void;
+  onMouseUp: () => void;
 }
 
 type BlockAction =
@@ -50,7 +54,17 @@ function createInitialState(initialValue: BlockProps["initialValue"]): BlockStat
   return new BlockState(initialValue.level, initialValue.name);
 }
 
-function Block({ type, index, total, initialValue, onRemove, isInitialEditing }: BlockProps) {
+function Block({
+  type,
+  index,
+  total,
+  initialValue,
+  onRemove,
+  isInitialEditing,
+  onMouseDown,
+  onMouseMove,
+  onMouseUp,
+}: BlockProps) {
   const [state, dispatch] = useReducer(reducer, initialValue, createInitialState);
   const [isEditing, setIsEditing] = useState(isInitialEditing ?? false);
 
@@ -66,25 +80,38 @@ function Block({ type, index, total, initialValue, onRemove, isInitialEditing }:
   function handleEditingMode() {
     setIsEditing((prev) => !prev);
   }
+  function handleMouseDown(event: MouseEvent<HTMLDivElement>) {
+    const pos: Position = { x: event.clientX, y: event.clientY };
+    onMouseDown(pos);
+  }
+  function handleMouseMove(event: MouseEvent<HTMLDivElement>) {
+    const pos: Position = { x: event.clientX, y: event.clientY };
+    onMouseMove(pos);
+  }
 
   const hasSubLevel = state.subLevel.length > 0;
-  const blockNameClasses = `${classes["block-name"]} ${classes[type]} ${hasSubLevel ? classes[`${type}-sublevel`] : ''} ${!isEditing ? classes[`level${state.level}`]: ''}`
+  const blockNameClasses = `${classes["block-name"]} ${classes[type]} ${
+    hasSubLevel ? classes[`${type}-sublevel`] : ""
+  }`;
 
   return (
     <div className={classes.container}>
-       {type === 'sub' && <Lines index={index} total={total} location="back" />}
-       <div className={classes['block-box']}>
-          {type === 'sub' && <Lines index={index} total={total} location="front" />}
+      {type === "sub" && <Lines index={index} total={total} location="back" />}
+      <div className={classes["block-box"]}>
+        {type === "sub" && <Lines index={index} total={total} location="front" />}
         <div className={blockNameClasses}>
           {isEditing ? (
-            <input
-              type="text"
-              value={state.name}
-              onChange={handleEdit}
-              placeholder="Category name"
-            />
+            <input type="text" value={state.name} onChange={handleEdit} placeholder="Category name" />
           ) : (
-            state.name ? state.name : <em>&nbsp;</em>
+            <span
+              className={!isEditing ? classes[`level${state.level}`] : ""}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={onMouseUp}
+              onMouseLeave={onMouseUp}
+            >
+              {state.name ? state.name : <em>&nbsp;</em>}
+            </span>
           )}
           <div className={classes["block-actions"]}>
             {!isEditing && <WidgetButton variant="plus" className="m-1 ml-2" onClick={handleAdd} />}
@@ -94,9 +121,9 @@ function Block({ type, index, total, initialValue, onRemove, isInitialEditing }:
             {type === "sub" && <WidgetButton variant="close" className="m-1" onClick={onRemove} />}
           </div>
         </div>
-       </div>
+      </div>
       {hasSubLevel && (
-        <div className={classes['children']}>
+        <div className={classes["children"]}>
           {state.subLevel.map(({ id, level }, index) => (
             <Block
               key={id}
@@ -106,6 +133,9 @@ function Block({ type, index, total, initialValue, onRemove, isInitialEditing }:
               initialValue={{ level, name: "" }}
               isInitialEditing={true}
               onRemove={handleRemove.bind(null, id)}
+              onMouseDown={onMouseDown}
+              onMouseMove={onMouseMove}
+              onMouseUp={onMouseUp}
             />
           ))}
         </div>

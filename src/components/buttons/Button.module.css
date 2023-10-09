@@ -7,12 +7,17 @@
   border: none;
   padding: 1rem;
   background-color: white;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.1s ease-in;
   border-radius: 2px;
   cursor: pointer;
 }
 
-.button:hover {
+button.button:hover {
+  color: white;
+  background-color: var(--slate-300);
+}
+
+select.button[aria-hidden="true"]:hover {
   color: white;
   background-color: var(--slate-300);
 }
