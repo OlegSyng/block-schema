@@ -3,12 +3,13 @@ import Block from "../block/Block";
 import SelectButton from "../buttons/SelectButton";
 import Button from "../buttons/Button";
 import Header from "../header/Header";
+import Drag from "../drag/Drag";
 import locationLogo from "../../assets/location-arrow-solid.svg";
 import chevronLeftLogo from "../../assets/chevron-left-solid.svg";
 import classes from "./Container.module.css";
 import headerClasses from "../header/Header.module.css";
 import buttonClasses from "../buttons/Button.module.css";
-import type { Reducer } from "react";
+import type { Reducer, PointerEvent } from "react";
 
 export interface Position {
   x: number;
@@ -16,9 +17,8 @@ export interface Position {
 }
 
 class ContainerState {
-  isDragging: boolean = false;
-  offset: Position = { x: 0, y: 0 };
   scale: string = "100";
+  isCenter: boolean = true;
 
   constructor(public position: Position) {
     this.position = position;
@@ -26,40 +26,28 @@ class ContainerState {
 }
 
 type ContainerAction =
-  | { type: "offset"; payload: Position }
   | { type: "position"; payload: Position }
   | { type: "recenter"; payload: Position }
   | { type: "move"; payload: number }
-  | { type: "stop-move" }
   | { type: "scale"; payload: string };
 
-const initialState = new ContainerState({ x: 0, y: 0 });
+const initialState = new ContainerState({ x: 0, y: 100 });
 
 const reducer: Reducer<ContainerState, ContainerAction> = (state, action) => {
   switch (action.type) {
-    case "offset": {
-      const newOffset = { x: action.payload.x - state.position.x, y: action.payload.y - state.position.y };
+    case "position": {
+      const newPosition = { x: state.position.x + action.payload.x, y: state.position.y + action.payload.y };
       return {
         ...state,
-        isDragging: true,
-        offset: newOffset,
+        isCenter: false,
+        position: newPosition,
       };
-    }
-    case "position": {
-      if (state.isDragging) {
-        const newPosition = { x: action.payload.x - state.offset.x, y: action.payload.y - state.offset.y };
-        return {
-          ...state,
-          position: newPosition,
-        };
-      } else {
-        return state;
-      }
     }
     case "recenter": {
       return {
         ...state,
-        position: action.payload,
+        isCenter: true,
+        position: { x: action.payload.x / 2, y: action.payload.y / 2 },
       };
     }
     case "move": {
@@ -84,13 +72,8 @@ const reducer: Reducer<ContainerState, ContainerAction> = (state, action) => {
       }
       return {
         ...state,
+        isCenter: false,
         position: newPosition,
-      };
-    }
-    case "stop-move": {
-      return {
-        ...state,
-        isDragging: false,
       };
     }
     case "scale": {
@@ -107,35 +90,21 @@ const reducer: Reducer<ContainerState, ContainerAction> = (state, action) => {
 function Container() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const sectionRef = useRef<HTMLElement>(null);
-  const schemaRef = useRef<HTMLDivElement>(null);
 
-  function handleMouseDown(pos: Position) {
-    dispatch({ type: "offset", payload: pos });
-  }
-  function handleMouseMove(pos: Position) {
-    dispatch({ type: "position", payload: pos });
-  }
-  function handleMouseUp() {
-    dispatch({ type: "stop-move" });
-  }
   function handleScaleChange(scale: string) {
     dispatch({ type: "scale", payload: scale });
   }
-  function recenterContainer() {
-    if (sectionRef.current && schemaRef.current) {
-      const sectionWidth = sectionRef.current.clientWidth;
-      const sectionHeight = sectionRef.current.clientHeight;
-      const schemaWidth = schemaRef.current.clientWidth;
-      const schemaHeight = schemaRef.current.clientHeight;
-      const newPosition = {
-        x: (sectionWidth - schemaWidth) / 2,
-        y: (sectionHeight - schemaHeight) / 2,
-      };
-      dispatch({ type: "recenter", payload: newPosition });
-    }
-  }
   function handleMove(direction: number) {
     dispatch({ type: "move", payload: direction });
+  }
+  function handleDragMove(event: PointerEvent<HTMLDivElement>) {
+    dispatch({ type: "position", payload: { x: event.movementX, y: event.movementY } });
+  }
+  function handleRecenter() {
+    dispatch({
+      type: "recenter",
+      payload: { x: sectionRef.current!.clientWidth, y: sectionRef.current!.clientHeight },
+    });
   }
 
   const calculatedScale = +state.scale / 100;
@@ -144,7 +113,7 @@ function Container() {
     <>
       <Header
         recenterButton={
-          <Button className="mr-2" onClick={recenterContainer}>
+          <Button className="mr-2" onClick={handleRecenter}>
             <img src={locationLogo} className={headerClasses.logo} />
           </Button>
         }
@@ -163,26 +132,18 @@ function Container() {
         <Button onClick={handleMove.bind(null, 4)} className={`${buttonClasses.button} ${classes["button-down"]}`}>
           <img src={chevronLeftLogo} className={classes.logo} />
         </Button>
-        <div
+        <Drag
+          onDragMove={handleDragMove}
           style={{
             position: "absolute",
-            top: state.position.y + "px",
-            left: state.position.x + "px",
+            top: `${state.position.y}px`,
+            left: `${state.position.x}px`,
+            width: "100%",
             scale: calculatedScale.toString(),
           }}
-          ref={schemaRef}
         >
-          <Block
-            type="main"
-            initialValue={{ level: 0, name: "Categories" }}
-            index={0}
-            total={0}
-            onRemove={() => {}}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-          />
-        </div>
+          <Block type="main" initialValue={{ level: 0, name: "Categories" }} index={0} total={0} onRemove={() => {}} />
+        </Drag>
       </section>
     </>
   );
