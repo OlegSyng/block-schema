@@ -1,4 +1,4 @@
-import { useReducer, useRef } from "react";
+import { useReducer, useRef, useEffect } from "react";
 import Block from "../block/Block";
 import SelectButton from "../buttons/SelectButton";
 import Button from "../buttons/Button";
@@ -19,10 +19,7 @@ export interface Position {
 class ContainerState {
   scale: string = "100";
   isCenter: boolean = true;
-
-  constructor(public position: Position) {
-    this.position = position;
-  }
+  constructor(public position: Position) {}
 }
 
 type ContainerAction =
@@ -31,7 +28,7 @@ type ContainerAction =
   | { type: "move"; payload: number }
   | { type: "scale"; payload: string };
 
-const initialState = new ContainerState({ x: 0, y: 100 });
+const initialState = new ContainerState({x: 0, y: 0});
 
 const reducer: Reducer<ContainerState, ContainerAction> = (state, action) => {
   switch (action.type) {
@@ -91,6 +88,15 @@ function Container() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const sectionRef = useRef<HTMLElement>(null);
 
+  useEffect(() => {
+    if(sectionRef.current) {
+      dispatch({
+        type: "recenter",
+        payload: { x: sectionRef.current.clientWidth, y: sectionRef.current.clientHeight },
+      });
+    }
+  }, [])
+
   function handleScaleChange(scale: string) {
     dispatch({ type: "scale", payload: scale });
   }
@@ -120,29 +126,47 @@ function Container() {
         selectButton={<SelectButton onScaleChange={handleScaleChange} />}
       />
       <section className={classes.container} ref={sectionRef}>
-        <Button onClick={handleMove.bind(null, 1)} className={`${buttonClasses.button} ${classes["button-left"]}`}>
+        <Button 
+          onClick={handleMove.bind(null, 1)} 
+          className={`${buttonClasses.button} ${classes["button-left"]}`}
+        >
           <img src={chevronLeftLogo} className={classes.logo} />
         </Button>
-        <Button onClick={handleMove.bind(null, 2)} className={`${buttonClasses.button} ${classes["button-right"]}`}>
+        <Button 
+          onClick={handleMove.bind(null, 2)} 
+          className={`${buttonClasses.button} ${classes["button-right"]}`}
+        >
           <img src={chevronLeftLogo} className={classes.logo} />
         </Button>
-        <Button onClick={handleMove.bind(null, 3)} className={`${buttonClasses.button} ${classes["button-up"]}`}>
+        <Button 
+          onClick={handleMove.bind(null, 3)} 
+          className={`${buttonClasses.button} ${classes["button-up"]}`}
+        >
           <img src={chevronLeftLogo} className={classes.logo} />
         </Button>
-        <Button onClick={handleMove.bind(null, 4)} className={`${buttonClasses.button} ${classes["button-down"]}`}>
+        <Button 
+          onClick={handleMove.bind(null, 4)} 
+          className={`${buttonClasses.button} ${classes["button-down"]}`}
+        >
           <img src={chevronLeftLogo} className={classes.logo} />
         </Button>
         <Drag
           onDragMove={handleDragMove}
           style={{
             position: "absolute",
-            top: `${state.position.y}px`,
-            left: `${state.position.x}px`,
-            width: "100%",
+            top: state.position.y + 'px',
+            left: state.position.x + 'px',
             scale: calculatedScale.toString(),
+            transform: 'translate(-50%, -50%)',
           }}
         >
-          <Block type="main" initialValue={{ level: 0, name: "Categories" }} index={0} total={0} onRemove={() => {}} />
+          <Block 
+            type="main" 
+            index={0} 
+            total={0} 
+            onRemove={() => {}} 
+            initialValue={{ level: 0, name: "Categories" }} 
+          />
         </Drag>
       </section>
     </>

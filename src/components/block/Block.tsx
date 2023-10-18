@@ -3,6 +3,8 @@ import WidgetButton from "../buttons/WidgetButton";
 import Lines from "../lines/Lines";
 import classes from "./Block.module.css";
 import type { Reducer, ChangeEvent } from "react";
+import Modal from "../modal/Modal";
+import Button from "../buttons/Button";
 
 class BlockState {
   id: string;
@@ -53,9 +55,14 @@ function createInitialState(initialValue: BlockProps["initialValue"]): BlockStat
 function Block({ type, index, total, initialValue, onRemove, isInitialEditing }: BlockProps) {
   const [state, dispatch] = useReducer(reducer, initialValue, createInitialState);
   const [isEditing, setIsEditing] = useState(isInitialEditing ?? false);
+  const [open, setOpen] = useState(false);
 
   function handleAdd() {
-    dispatch({ type: "add" });
+    if(state.level >= 1 && !hasSubLevel) {
+      setOpen(true);
+    } else {
+      dispatch({ type: "add" });
+    }
   }
   function handleRemove(subBlockId: BlockState["id"]) {
     dispatch({ type: "remove", payload: subBlockId });
@@ -65,6 +72,10 @@ function Block({ type, index, total, initialValue, onRemove, isInitialEditing }:
   }
   function handleEditingMode() {
     setIsEditing((prev) => !prev);
+  }
+  function handleClickCategory() {
+    dispatch({type: 'add'})
+    setOpen(false)
   }
 
   const hasSubLevel = state.subLevel.length > 0;
@@ -92,6 +103,11 @@ function Block({ type, index, total, initialValue, onRemove, isInitialEditing }:
             )}
             {type === "sub" && <WidgetButton variant="close" className="m-1" onClick={onRemove} />}
           </div>
+          <Modal 
+            open={open}
+            categoryButton={<Button onClick={handleClickCategory}>Category</Button>}
+            serviceButton={<Button onClick={() => setOpen(false)}>Service</Button>}
+        />
         </div>
       </div>
       {hasSubLevel && (
